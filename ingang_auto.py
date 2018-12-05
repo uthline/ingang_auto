@@ -42,11 +42,15 @@ class WhiteWindow(QMainWindow):
         if self.pos_start is not None:
             self.update()
 
+    def keyPressEvent(self, QEvent):
+        self.close()
+
     def closeEvent(self, QEvent):
-        rect = QRect(self.pos_start.x(), self.pos_start.y(),
-                     self.pos_end.x() - self.pos_start.x(),
-                     self.pos_end.y() - self.pos_start.y());
-        self.sig_region_updated.emit(rect)
+        if self.pos_start is not None and self.pos_end is not None:
+            rect = QRect(self.pos_start.x(), self.pos_start.y(),
+                         self.pos_end.x() - self.pos_start.x(),
+                         self.pos_end.y() - self.pos_start.y());
+            self.sig_region_updated.emit(rect)
         QApplication.setOverrideCursor(Qt.ArrowCursor)
 
 form_class = uic.loadUiType("dialog.ui")[0]
