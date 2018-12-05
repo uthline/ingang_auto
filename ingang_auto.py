@@ -47,6 +47,7 @@ class WhiteWindow(QMainWindow):
                      self.pos_end.x() - self.pos_start.x(),
                      self.pos_end.y() - self.pos_start.y());
         self.sig_region_updated.emit(rect)
+        QApplication.setOverrideCursor(Qt.ArrowCursor)
 
 form_class = uic.loadUiType("dialog.ui")[0]
 
@@ -69,6 +70,10 @@ class MyWindow(QMainWindow, form_class):
         self.pos_end_x.setText(str(rect.right()))
         self.pos_end_y.setText(str(rect.bottom()))
 
+    def folderbuttonclicked(self):
+        path = QFileDialog.getExistingDirectory(self, 'Select png folder')
+        self.folderPath.setText(path)
+
 class MyApplication(QApplication):
     def __init__(self, argv):
         super().__init__(argv)
@@ -89,6 +94,7 @@ class MyApplication(QApplication):
 
     @pyqtSlot()
     def show_white_board(self):
+        QApplication.setOverrideCursor(Qt.CrossCursor)
         self.white_wind.showFullScreen()
 
 if __name__ == "__main__":
