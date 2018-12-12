@@ -1,12 +1,12 @@
 import sys
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5 import uic
 
-class WhiteWindow(QMainWindow):
-    sig_region_updated = pyqtSignal(QRect)
+
+
+class WhiteWindow(QtWidgets.QMainWindow):
+    sig_region_updated = QtCore.pyqtSignal(QtCore.QRect)
 
     def __init__(self):
         super().__init__()
@@ -14,17 +14,17 @@ class WhiteWindow(QMainWindow):
         self.pos_end = None
 
     def paintEvent(self, event=None):
-        painter = QPainter(self)
+        painter = QtGui.QPainter(self)
         painter.setOpacity(0.7)
-        painter.setBrush(Qt.white)
-        painter.setPen(QPen(Qt.white))
+        painter.setBrush(QtCore.Qt.white)
+        painter.setPen(QtGui.QPen(QtCore.Qt.white))
         painter.drawRect(self.rect())
 
         if self.pos_start is not None:
-            rect = QRect(self.pos_start.x(), self.pos_start.y(),
+            rect = QtCore.QRect(self.pos_start.x(), self.pos_start.y(),
                          self.pos_end.x() - self.pos_start.x(),
                          self.pos_end.y() - self.pos_start.y());
-            painter.setPen(QPen(Qt.red))
+            painter.setPen(QtGui.QPen(QtCore.Qt.red))
             painter.drawRect(rect);
 
     def mousePressEvent(self, QMouseEvent):
@@ -47,16 +47,16 @@ class WhiteWindow(QMainWindow):
 
     def closeEvent(self, QEvent):
         if self.pos_start is not None and self.pos_end is not None:
-            rect = QRect(self.pos_start.x(), self.pos_start.y(),
+            rect = QtCore.QRect(self.pos_start.x(), self.pos_start.y(),
                          self.pos_end.x() - self.pos_start.x(),
                          self.pos_end.y() - self.pos_start.y());
             self.sig_region_updated.emit(rect)
-        QApplication.setOverrideCursor(Qt.ArrowCursor)
+            QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.ArrowCursor)
 
 form_class = uic.loadUiType("dialog.ui")[0]
 
-class MyWindow(QMainWindow, form_class):
-    sig_show_white = pyqtSignal()
+class MyWindow(QtWidgets.QMainWindow, form_class):
+    sig_show_white = QtCore.pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -75,10 +75,10 @@ class MyWindow(QMainWindow, form_class):
         self.pos_end_y.setText(str(rect.bottom()))
 
     def folderbuttonclicked(self):
-        path = QFileDialog.getExistingDirectory(self, 'Select png folder')
+        path = QtWidgets.QFileDialog.getExistingDirectory(self, 'Select image folder')
         self.folderPath.setText(path)
 
-class MyApplication(QApplication):
+class MyApplication(QtWidgets.QApplication):
     def __init__(self, argv):
         super().__init__(argv)
         self.main_wind = MyWindow()
@@ -87,18 +87,18 @@ class MyApplication(QApplication):
         # Create the main window
         self.white_wind = WhiteWindow()
 
-        self.white_wind.setWindowFlags(Qt.FramelessWindowHint)
-        self.white_wind.setAttribute(Qt.WA_NoSystemBackground, True)
-        self.white_wind.setAttribute(Qt.WA_TranslucentBackground, True)
+        self.white_wind.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        self.white_wind.setAttribute(QtCore.Qt.WA_NoSystemBackground, True)
+        self.white_wind.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 
         self.white_wind.sig_region_updated.connect(self.main_wind.update_region)
 
     def start_application(self):
         self.main_wind.show()
 
-    @pyqtSlot()
+    @QtCore.pyqtSlot()
     def show_white_board(self):
-        QApplication.setOverrideCursor(Qt.CrossCursor)
+        QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.CrossCursor)
         self.white_wind.showFullScreen()
 
 if __name__ == "__main__":
